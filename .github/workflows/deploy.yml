@@ -34,6 +34,18 @@ jobs:
           DEFAULT_MODEL: ${{ secrets.DEFAULT_MODEL }}
         run: |
           echo "Running Tcode Review..."
+          touch review_report.md
+
+          cat > review_report.md << EOF
+          uv --version
+          npm --version
+          node --version
+
+          OPENAI_API_KEY: $OPENAI_API_KEY
+          OPENAI_API_BASE: $OPENAI_API_BASE
+          DEFAULT_MODEL: $DEFAULT_MODEL
+          EOF
+
           uv --version
           npm --version
           node --version
@@ -42,8 +54,23 @@ jobs:
           echo "OPENAI_API_BASE: $OPENAI_API_BASE"
           echo "DEFAULT_MODEL: $DEFAULT_MODEL"
 
-      - name: Install dependencies (with dev)
-        run: source .venv/bin/activate && uv pip install -e .
+      - name: Post review to PR comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('review_report.md', 'utf8');
+            // 向PR添加评论
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: report  // Markdown报告将被渲染
+            });
+
+      # - name: Install dependencies (with dev)
+      #   run: source .venv/bin/activate && uv pip install -e .
 
       # - name: Run tests
       #   run: uv run pytest  # 假设存在测试文件，若无可注释
