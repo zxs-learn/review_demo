@@ -31,6 +31,10 @@ jobs:
           DEFAULT_MODEL: ${{ secrets.DEFAULT_MODEL }}
         run: |
           echo "Running Tcode Review..."
+          uv --version
+          npm --version
+          node --version
+          
           echo "OPENAI_API_KEY: $OPENAI_API_KEY"
           echo "OPENAI_API_BASE: $OPENAI_API_BASE"
           echo "DEFAULT_MODEL: $DEFAULT_MODEL"
