@@ -1,0 +1,16 @@
+[project]
+name = "fastapi-uv-demo"
+version = "0.1.0"
+description = "FastAPI demo with uv package manager"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.104.1",
+    "pytest>=9.0.2",
+    "uvicorn>=0.24.0.post1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "httpx>=0.25.2",
+]

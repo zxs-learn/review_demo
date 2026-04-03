@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${REGISTRY:-local}/fastapi-uv-demo:${TAG:-latest}
+    ports:
+      - "8000:8000"
+    volumes:
+      - /Users/brandon/Desktop/fastapi-uv-demo/data:/app/data # 挂载项目目录
+      # - fastapi_data:/app/data # 数据持久化卷
+    restart: always
+    user: "1001:1001"  # 与Dockerfile中的用户一致
+
+volumes:
+  fastapi_data:  # 命名卷，由Docker管理存储
