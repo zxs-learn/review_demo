@@ -24,6 +24,9 @@ jobs:
       - name: Init uv env
         run: uv venv --python 3.11
 
+      - name: Install Tcode
+        run: npm install --foreground-scripts -g @brandon_9527/tcode 
+
       - name: Run Tcode Review
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -34,7 +37,7 @@ jobs:
           uv --version
           npm --version
           node --version
-          
+
           echo "OPENAI_API_KEY: $OPENAI_API_KEY"
           echo "OPENAI_API_BASE: $OPENAI_API_BASE"
           echo "DEFAULT_MODEL: $DEFAULT_MODEL"
