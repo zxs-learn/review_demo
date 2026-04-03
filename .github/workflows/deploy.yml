@@ -46,15 +46,18 @@ jobs:
           DEFAULT_MODEL: $DEFAULT_MODEL
           EOF
 
-          uv --version
-          npm --version
-          node --version
+          cat review_report.md
 
-          echo "OPENAI_API_KEY: $OPENAI_API_KEY"
-          echo "OPENAI_API_BASE: $OPENAI_API_BASE"
-          echo "DEFAULT_MODEL: $DEFAULT_MODEL"
+          # uv --version
+          # npm --version
+          # node --version
+
+          # echo "OPENAI_API_KEY: $OPENAI_API_KEY"
+          # echo "OPENAI_API_BASE: $OPENAI_API_BASE"
+          # echo "DEFAULT_MODEL: $DEFAULT_MODEL"
 
       - name: Post review to PR comment
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GH_TOKEN }}
