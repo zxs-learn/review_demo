@@ -16,8 +16,11 @@ jobs:
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
+      - name: Init uv env
+        run: uv venv --python 3.11
+
       - name: Install dependencies (with dev)
-        run: uv pip install -e .
+        run: source .venv/bin/activate && uv pip install -e .
 
       - name: Run tests
         run: uv run pytest  # 假设存在测试文件，若无可注释
