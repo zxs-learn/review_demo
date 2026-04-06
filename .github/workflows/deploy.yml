@@ -24,8 +24,14 @@ jobs:
       - name: Init uv env
         run: uv venv --python 3.11
 
-      # - name: Install Tcode
-      #   run: npm install --foreground-scripts -g @brandon_9527/tcode 
+      - name: Install Tcode
+        run: npm install --foreground-scripts -g @brandon_9527/tcode 
+
+      - name: Generate code diff
+        run: |
+          # 获取PR的代码变更（对比base分支和当前分支）
+          git diff origin/${{ github.base_ref }} HEAD > diff.txt
+          cat diff.txt
 
       - name: Run Tcode Review
         env:
@@ -33,28 +39,24 @@ jobs:
           OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
           DEFAULT_MODEL: ${{ secrets.DEFAULT_MODEL }}
         run: |
-          echo "Running Tcode Review..."
-          touch review_report.md
+          tcode -v -p "读取 diff.txt 文件，根据文件内容对当前项目代码进行review，如果 diff.txt 文件没有diff内容，则直接对项目进行全量审查， 最后将review结果输出到 review_report.md 文件中"
+          # echo "Running Tcode Review..."
+          # touch review_report.md
 
-          cat > review_report.md << EOF
-          uv --version
-          npm --version
-          node --version
-
-          OPENAI_API_KEY: $OPENAI_API_KEY
-          OPENAI_API_BASE: $OPENAI_API_BASE
-          DEFAULT_MODEL: $DEFAULT_MODEL
-          EOF
-
-          cat review_report.md
-
+          # cat > review_report.md << EOF
           # uv --version
           # npm --version
           # node --version
 
-          # echo "OPENAI_API_KEY: $OPENAI_API_KEY"
-          # echo "OPENAI_API_BASE: $OPENAI_API_BASE"
-          # echo "DEFAULT_MODEL: $DEFAULT_MODEL"
+          # OPENAI_API_KEY: $OPENAI_API_KEY
+          # OPENAI_API_BASE: $OPENAI_API_BASE
+          # DEFAULT_MODEL: $DEFAULT_MODEL
+          # EOF
+
+          # cat review_report.md
+
+          
+
 
       - name: Post review to PR comment
         if: github.event_name == 'pull_request'
@@ -71,6 +73,7 @@ jobs:
               issue_number: context.payload.pull_request.number,
               body: report  // Markdown报告将被渲染
             });
+            
 
       # - name: Install dependencies (with dev)
       #   run: source .venv/bin/activate && uv pip install -e .
