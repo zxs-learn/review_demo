@@ -256,11 +256,13 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  review:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -276,13 +278,28 @@ jobs:
       - name: Install Tcode
         run: npm install --foreground-scripts -g @brandon_9527/tcode 
 
+      - name: Fetch base branch
+        run: git fetch origin main
+
+      - name: Show git info
+        run: |
+          git branch -a
+          git log --oneline --graph --decorate -20
+
+      - name: Generate code diff
+        run: |
+          # 获取PR的代码变更（对比base分支和当前分支）
+          git diff origin/${{ github.base_ref }}...HEAD > diff.txt
+          cat diff.txt
+
       - name: Run Tcode Review
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
           DEFAULT_MODEL: ${{ secrets.DEFAULT_MODEL }}
         run: |
-          tcode -p "请对当前项目的代码进行 review，将结果输出到 review_report.md 文件中"
+          tcode -v -p "读取 diff.txt 文件，根据文件内容对当前项目代码进行review，如果 diff.txt 文件没有diff内容，则直接对项目进行全量审查， 最后将review结果输出到 review_report.md 文件中"
+      
 
       - name: Post review to PR comment
         if: github.event_name == 'pull_request'
